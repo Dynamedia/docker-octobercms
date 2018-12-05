@@ -1,0 +1,11 @@
+version: "3.4"
+
+services:
+  octobercms:
+    build: .
+    image: dynamedia/docker-octobercms
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - 80:80

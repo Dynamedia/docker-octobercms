@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     # October CMS needs to maintain state so it's a good idea to mount some volumes
     volumes:
-      - ./data/storage/app:/var/www/app/storage/app/
+      - ./data/storage:/var/www/app/storage/app/
       - ./data/plugins:/var/www/app/plugins/
       - ./data/themes:/var/www/app/themes/
     # In production you'll want to have https. Use a reverse proxy ssl terminator in front of this container

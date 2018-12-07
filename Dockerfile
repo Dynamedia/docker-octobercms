@@ -10,10 +10,18 @@ ENV OCTOBERCMS_TAG v1.0.443
 
 RUN apt update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
+        curl \
+        software-properties-common \
+        gnupg2 && \
+    curl -sL https://deb.nodesource.com/setup_11.x | bash - && \
+    apt update && \
+    apt-get install --no-install-recommends --no-install-suggests -y \
+        nodejs \
         cron && \
     apt clean && \
     rm -rf /var/lib/apt/lists/* && \
     ldconfig && \
+    npm install yarn -g && \
     mv /usr/local/bin/entrypoint.sh /usr/local/bin/nginx-fpm-entrypoint.sh
 
 WORKDIR /var/www/

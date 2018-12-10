@@ -158,7 +158,7 @@ install_git_repo()
         if [ ! -e "$dest_path" ]; then
             git clone "https://$username:$token@$domain/$git_namespace/$git_repo" "$dest_path"
         else
-            return #(cd "$dest_path" && git pull)
+            (cd "$dest_path" && git pull)
         fi
     done
 }

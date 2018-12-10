@@ -33,8 +33,20 @@ OC_REDO_PLUGINS=${OC_REDO_PLUGINS:-false}
 OC_REDO_THEMES=${OC_REDO_THEMES:-false}
 OC_PLUGINS=${OC_PLUGINS:-}
 OC_THEMES=${OC_THEMES:-}
+OC_ACTIVE_THEME=${OC_ACTIVE_THEME:-}
 
 ### Functions ###
+
+check_db_connection()
+{
+
+if php_db_test.php $OC_DB_CONNECTION $OC_DB_HOST $OC_DB_PORT $OC_DB_USERNAME $OC_DB_PASSWORD $OC_DB_DATABASE ; then
+        return 0
+else
+        return 1
+fi
+
+}
 
 log_entry()
 {
@@ -179,16 +191,13 @@ if [ ! -f .env ] ; then
 fi
 
 
-# If we're using sqlite (the default), make sure we have a file to use
+# If we're using sqlite (the default), make sure we have a file to use. Other databases tested later
 if [ "$OC_DB_CONNECTION" = "sqlite" ] ; then
     if [ ! -e "$OC_DB_DATABASE" ] ; then
         touch "$OC_DB_DATABASE"
         chown "$USER_UID:$USER_UID" "$OC_DB_DATABASE" # Inherited $USER_UID from nginx/php
     fi
 fi
-
-# TODO check connection for other database types. Maybe one day...
-# For now it doesn't matter. If it doesn't connect then we will soon find out
 
 
 # Only replace the app key if we have one set by env.
@@ -207,8 +216,8 @@ sed -i "s#DB_USERNAME=.*#DB_USERNAME=$OC_DB_USERNAME#g" .env
 sed -i "s#DB_PASSWORD=.*#DB_PASSWORD=$OC_DB_PASSWORD#g" .env
 sed -i "s#REDIS_HOST=.*#REDIS_HOST=$OC_REDIS_HOST#g" .env
 sed -i "s#REDIS_PASSWORD=.*#REDIS_PASSWORD=$OC_REDIS_PASSWORD#g" .env
-sed -i "s#CACHE_DRIVER=.*#CACHE_DRIVER=$OC_CACHE_DRIVER#g" .env
-sed -i "s#SESSION_DRIVER=.*#SESSION_DRIVER=$OC_SESSION_DRIVER#g" .env
+sed -i "s#CACHE_DRIVER=.*#CACHE_DRIVER=file#g" .env
+sed -i "s#SESSION_DRIVER=.*#SESSION_DRIVER=$file#g" .env
 sed -i "s#QUEUE_DRIVER=.*#QUEUE_DRIVER=$OC_QUEUE_DRIVER#g" .env
 sed -i "s#MAIL_DRIVER=.*#MAIL_DRIVER=$OC_MAIL_DRIVER#g" .env
 sed -i "s#MAIL_HOST=.*#MAIL_HOST=$OC_MAIL_HOST#g" .env
@@ -226,7 +235,9 @@ sed -i "s#ENABLE_CSRF=.*#ENABLE_CSRF=$OC_ENABLE_CSRF#g" .env
 log_entry "Config last processed: " "$(get_date_time)"
 
 # Bring up the database and install some plugins
-if [ "$OC_DB_CONNECTION" != "none" ] ; then
+if [ "$OC_DB_CONNECTION" != "null" ] ; then
+    # Test our database connection
+    if ! check_db_connection ; then exit ; fi
     # Always do this because we want to run migrations if necessary
     php artisan october:up
 
@@ -262,9 +273,20 @@ if [ "$OC_DB_CONNECTION" != "none" ] ; then
 
 fi
 
+# Final edits to the main configuration. We forced session and cache drivers to file above because setting
+# redis too early breaks things because we wont have the drivers. User can still make this fail but the fix is adding october.drivers
+# and using a database
+sed -i "s#CACHE_DRIVER=.*#CACHE_DRIVER=$OC_CACHE_DRIVER#g" .env
+sed -i "s#SESSION_DRIVER=.*#SESSION_DRIVER=$OC_SESSION_DRIVER#g" .env
+
 # Delete the demo theme
 if [ "$OC_FRESH_INSTALL" = 'true' ] && [ -d "themes/october/demo" ] ; then
     php artisan october:fresh
+fi
+
+# Set the active theme
+if [ ! -z $OC_ACTIVE_THEME ] ; then
+    php artisan theme:use $OC_ACTIVE_THEME
 fi
 
 # vars set by nginx-fpm-entrypoint.sh if not overridden here

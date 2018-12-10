@@ -37,6 +37,8 @@ RUN rm -rf app && \
 
 COPY ./octobercms.conf /etc/nginx/sites-enabled/conf.d/octobercms.conf
 
+COPY ./php_db_test.php /usr/local/bin/php_db_test.php
+
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 
 WORKDIR /var/www/app/

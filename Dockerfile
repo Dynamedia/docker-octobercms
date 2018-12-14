@@ -17,23 +17,23 @@ RUN apt update && \
     apt update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
         nodejs \
+        sendmail-bin \
         cron && \
     apt clean && \
     rm -rf /var/lib/apt/lists/* && \
     ldconfig && \
     npm install yarn -g && \
-    mv /usr/local/bin/entrypoint.sh /usr/local/bin/nginx-fpm-entrypoint.sh
-
-WORKDIR /var/www/
-
-RUN rm -rf app && \
+    mv /usr/local/bin/entrypoint.sh /usr/local/bin/nginx-fpm-entrypoint.sh && \
+    cd /var/www/ && \
+    rm -rf app && \
     rm /etc/nginx/sites-enabled/conf.d/php.conf && \
     git clone https://github.com/octobercms/october.git -b $OCTOBERCMS_TAG --depth 1 app && \
     cd app && \
     composer install --no-interaction --prefer-dist --no-scripts && \
     composer clearcache && \
     git status && git reset --hard HEAD && \
-    rm -rf .git
+    rm -rf .git && \
+    mv themes/demo/ ./demotheme
 
 COPY ./octobercms.conf /etc/nginx/sites-enabled/conf.d/octobercms.conf
 

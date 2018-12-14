@@ -14,7 +14,7 @@ OC_DB_DATABASE=${OC_DB_DATABASE:-october}
 OC_DB_USERNAME=${OC_DB_USERNAME:-october}
 OC_DB_PASSWORD=${OC_DB_PASSWORD:-october}
 OC_REDIS_HOST=${OC_REDIS_HOST:-redis}
-OC_REDIS_PASSWORD=${OC_REDIS_PASSWORD:-}
+OC_REDIS_PASSWORD=${OC_REDIS_PASSWORD:-null}
 OC_CACHE_DRIVER=${OC_CACHE_DRIVER:-file}
 OC_SESSION_DRIVER=${OC_SESSION_DRIVER:-file}
 OC_QUEUE_DRIVER=${OC_QUEUE_DRIVER:-sync}
@@ -33,7 +33,30 @@ OC_REDO_PLUGINS=${OC_REDO_PLUGINS:-false}
 OC_REDO_THEMES=${OC_REDO_THEMES:-false}
 OC_PLUGINS=${OC_PLUGINS:-}
 OC_THEMES=${OC_THEMES:-}
-OC_ACTIVE_THEME=${OC_ACTIVE_THEME:-}
+OC_ACTIVE_THEME=${OC_ACTIVE_THEME:-demo}
+OC_EDGE_UPDATES=${OC_EDGE_UPDATES:-false}
+OC_DISABLE_CORE_UPDATES=${OC_DISABLE_CORE_UPDATES:-false}
+OC_BACKEND_FORCE_SECURE=${OC_BACKEND_FORCE_SECURE:-null}
+OC_BACKEND_URI=${OC_BACKEND_URI:-backend}
+OC_ENABLE_SAFE_MODE=${OC_ENABLE_SAFE_MODE:-false}
+OC_FORCE_BYTECODE_INVALIDATION=${OC_FORCE_BYTECODE_INVALIDATION:-true}
+OC_CONVERT_LINE_ENDINGS=${OC_CONVERT_LINE_ENDINGS:-false}
+OC_APP_NAME=${OC_APP_NAME:-October CMS}
+OC_APP_TIMEZONE=${OC_APP_TIMEZONE:-UTC}
+OC_APP_LOCALE=${OC_APP_LOCALE:-en}
+OC_APP_FALLBACK_LOCALE=${OC_APP_FALLBACK_LOCALE:-en}
+OC_APP_CIPHER=${OC_APP_CIPHER:-AES-256-CBC}
+OC_APP_LOG=${OC_APP_LOG:-single}
+OC_DISABLE_REQUEST_CACHE=${OC_DISABLE_REQUEST_CACHE:-false}
+OC_BROADCASTER_DRIVER=${OC_BROADCASTER_DRIVER:-pusher}
+OC_APP_ENVIRONMENT=${OC_APP_ENVIRONMENT:-development}
+OC_SESSION_LIFETIME=${OC_SESSION_LIFETIME:-120}
+OC_SESSION_EXPIRE_ON_CLOSE=${OC_SESSION_EXPIRE_ON_CLOSE:-false}
+OC_SESSION_ENCRYPT=${OC_SESSION_ENCRYPT:-false}
+OC_SESSION_COOKIE=${OC_SESSION_COOKIE:-october_session}
+
+
+
 
 ### Functions ###
 
@@ -177,6 +200,11 @@ install_git_repo()
 
 ### End Functions ###
 
+# Move things back to their proper places. The build moved them to enable the entire october cms app to be a volume mount if desired
+
+mv demotheme themes/demo
+
+
 # Create log file if it's not present
 touch storage/logs/docker-october.log
 
@@ -205,7 +233,55 @@ if [ ! -z $OC_APP_KEY ] ; then
     sed -i "s#APP_KEY=.*#APP_KEY=$OC_APP_KEY#g" .env
 fi
 
-# Edit the rest of the .env configuration
+# Create a more 'envable' configuration
+sed -i "s#'edgeUpdates'\s=>.*#'edgeUpdates' => env('EDGE_UPDATES', false),#g" config/cms.php
+sed -i "s#'disableCoreUpdates'\s=>.*#'disableCoreUpdates' => env('DISABLE_CORE_UPDATES', false),#g" config/cms.php
+sed -i "s#'backendForceSecure'\s=>.*#'backendForceSecure' => env('BACKEND_FORCE_SECURE', null),#g" config/cms.php
+sed -i "s#'backendUri'\s=>.*#'backendUri' => env('BACKEND_URI', 'backend'),#g" config/cms.php
+sed -i "s#'activeTheme'\s=>.*#'activeTheme' => env('ACTIVE_THEME', 'demo'),#g" config/cms.php
+sed -i "s#'enableSafeMode'\s=>.*#'enableSafeMode' => env('ENABLE_SAFE_MODE', null),#g" config/cms.php
+sed -i "s#'forceBytecodeInvalidation'\s=>.*#'forceBytecodeInvalidation' => env('FORCE_BYTECODE_INVALIDATION', true),#g" config/cms.php
+sed -i "s#'convertLineEndings'\s=>.*#'convertLineEndings' => env('CONVERT_LINE_ENDINGS', false),#g" config/cms.php
+sed -i "s#'name'\s=>.*#'name' => env('APP_NAME', 'October CMS'),#g" config/app.php
+sed -i "s#'timezone'\s=>.*#'timezone' => env('APP_TIMEZONE', 'UTC'),#g" config/app.php
+sed -i "s#'locale'\s=>.*#'locale' => env('APP_LOCALE', 'en'),#g" config/app.php
+sed -i "s#'fallback_locale'\s=>.*#'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),#g" config/app.php
+sed -i "s#'cipher'\s=>.*#'cipher' => env('APP_CIPHER', 'AES-256-CBC'),#g" config/app.php
+sed -i "s#'log'\s=>.*#'log' => env('APP_LOG', 'single'),#g" config/app.php
+sed -i "s#'disableRequestCache'\s=>.*#'disableRequestCache' => env('DISABLE_REQUEST_CACHE', false),#g" config/cache.php
+sed -i "s#'default'\s=>.*#'default' => env('BROADCASTER_DRIVER', 'pusher'),#g" config/broadcasting.php
+sed -i "s#'default'\s=>.*#'default' => env('APP_ENVIRONMENT', 'development'),#g" config/environment.php
+sed -i "s#'lifetime'\s=>.*#'lifetime' => env('SESSION_LIFETIME', 120),#g" config/session.php
+sed -i "s#'expire_on_close'\s=>.*#'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),#g" config/session.php
+sed -i "s#'encrypt'\s=>.*#'encrypt' => env('SESSION_ENCRYPT', false),#g" config/session.php
+sed -i "s#'cookie'\s=>.*#'cookie' => env('SESSION_COOKIE', 'october_session'),#g" config/session.php
+
+
+# Create .env entries for our new settings if they don't already exist
+if ! grep "^EDGE_UPDATES" .env ; then echo "EDGE_UPDATES=$OC_EDGE_UPDATES" >> .env ; fi
+if ! grep "^DISABLE_CORE_UPDATES" .env ; then echo "DISABLE_CORE_UPDATES=$OC_DISABLE_CORE_UPDATES" >> .env ; fi
+if ! grep "^BACKEND_FORCE_SECURE" .env ; then echo "BACKEND_FORCE_SECURE=$OC_BACKEND_FORCE_SECURE" >> .env ; fi
+if ! grep "^BACKEND_URI" .env ; then echo "BACKEND_URI=$OC_BACKEND_URI" >> .env ; fi
+if ! grep "^ENABLE_SAFE_MODE" .env ; then echo "ENABLE_SAFE_MODE=$OC_ENABLE_SAFE_MODE" >> .env ; fi
+if ! grep "^FORCE_BYTECODE_INVALIDATION" .env ; then echo "FORCE_BYTECODE_INVALIDATION=$OC_FORCE_BYTECODE_INVALIDATION" >> .env ; fi
+if ! grep "^CONVERT_LINE_ENDINGS" .env ; then echo "CONVERT_LINE_ENDINGS=$OC_CONVERT_LINE_ENDINGS" >> .env ; fi
+if ! grep "^APP_NAME" .env ; then echo "APP_NAME=\"$OC_APP_NAME\"" >> .env ; fi
+if ! grep "^APP_TIMEZONE" .env ; then echo "APP_TIMEZONE=$OC_APP_TIMEZONE" >> .env ; fi
+if ! grep "^APP_LOCALE" .env ; then echo "APP_LOCALE=$OC_APP_LOCALE" >> .env ; fi
+if ! grep "^APP_FALLBACK_LOCALE" .env ; then echo "APP_FALLBACK_LOCALE=$OC_APP_FALLBACK_LOCALE" >> .env ; fi
+if ! grep "^APP_CIPHER" .env ; then echo "APP_CIPHER=$OC_APP_CIPHER" >> .env ; fi
+if ! grep "^APP_LOG" .env ; then echo "APP_LOG=$OC_APP_LOG" >> .env ; fi
+if ! grep "^DISABLE_REQUEST_CACHE" .env ; then echo "DISABLE_REQUEST_CACHE=$OC_DISABLE_REQUEST_CACHE" >> .env ; fi
+if ! grep "^BROADCASTER_DRIVER" .env ; then echo "BROADCASTER_DRIVER=$OC_BROADCASTER_DRIVER" >> .env ; fi
+if ! grep "^APP_ENVIRONMENT" .env ; then echo "APP_ENVIRONMENT=$OC_APP_ENVIRONMENT" >> .env ; fi
+if ! grep "^SESSION_LIFETIME" .env ; then echo "SESSION_LIFETIME=$OC_SESSION_LIFETIME" >> .env ; fi
+if ! grep "^SESSION_EXPIRE_ON_CLOSE" .env ; then echo "SESSION_EXPIRE_ON_CLOSE=$OC_SESSION_EXPIRE_ON_CLOSE" >> .env ; fi
+if ! grep "^SESSION_ENCRYPT" .env ; then echo "SESSION_ENCRYPT=$OC_SESSION_ENCRYPT" >> .env ; fi
+if ! grep "^SESSION_COOKIE" .env ; then echo "SESSION_COOKIE=$OC_SESSION_COOKIE" >> .env ; fi
+if ! grep "^ACTIVE_THEME" .env ; then echo "ACTIVE_THEME=$OC_ACTIVE_THEME" >> .env ; fi
+
+
+# Edit the default .env file created by october:env
 sed -i "s#APP_DEBUG=.*#APP_DEBUG=$OC_APP_DEBUG#g" .env
 sed -i "s#APP_URL=.*#APP_URL=$OC_APP_URL#g" .env
 sed -i "s#DB_CONNECTION=.*#DB_CONNECTION=$OC_DB_CONNECTION#g" .env
@@ -229,6 +305,29 @@ sed -i "s#ROUTES_CACHE=.*#ROUTES_CACHE=$OC_ROUTES_CACHE#g" .env
 sed -i "s#ASSET_CACHE=.*#ASSET_CACHE=$OC_ASSET_CACHE#g" .env
 sed -i "s#LINK_POLICY=.*#LINK_POLICY=$OC_LINK_POLICY#g" .env
 sed -i "s#ENABLE_CSRF=.*#ENABLE_CSRF=$OC_ENABLE_CSRF#g" .env
+
+# Edit our custom .env entries
+sed -i "s#EDGE_UPDATES=.*#EDGE_UPDATES=$OC_EDGE_UPDATES#g" .env
+sed -i "s#DISABLE_CORE_UPDATES=.*#DISABLE_CORE_UPDATES=$OC_DISABLE_CORE_UPDATES#g" .env
+sed -i "s#BACKEND_FORCE_SECURE=.*#BACKEND_FORCE_SECURE=$OC_BACKEND_FORCE_SECURE#g" .env
+sed -i "s#BACKEND_URI=.*#BACKEND_URI=$OC_BACKEND_URI#g" .env
+sed -i "s#ENABLE_SAFE_MODE=.*#ENABLE_SAFE_MODE=$OC_ENABLE_SAFE_MODE#g" .env
+sed -i "s#FORCE_BYTECODE_INVALIDATION=.*#FORCE_BYTECODE_INVALIDATION=$OC_FORCE_BYTECODE_INVALIDATION#g" .env
+sed -i "s#CONVERT_LINE_ENDINGS=.*#CONVERT_LINE_ENDINGS=$OC_CONVERT_LINE_ENDINGS#g" .env
+sed -i "s#APP_NAME=.*#APP_NAME=\"$OC_APP_NAME\"#g" .env
+sed -i "s#APP_TIMEZONE=.*#APP_TIMEZONE=$OC_APP_TIMEZONE#g" .env
+sed -i "s#APP_LOCALE=.*#APP_LOCALE=$OC_APP_LOCALE#g" .env
+sed -i "s#APP_FALLBACK_LOCALE=.*#APP_FALLBACK_LOCALE=$OC_APP_FALLBACK_LOCALE#g" .env
+sed -i "s#APP_CIPHER=.*#APP_CIPHER=$OC_APP_CIPHER#g" .env
+sed -i "s#APP_LOG=.*#APP_LOG=$OC_APP_LOG#g" .env
+sed -i "s#DISABLE_REQUEST_CACHE=.*#DISABLE_REQUEST_CACHE=$OC_DISABLE_REQUEST_CACHE#g" .env
+sed -i "s#BROADCASTER_DRIVER=.*#BROADCASTER_DRIVER=$OC_BROADCASTER_DRIVER#g" .env
+sed -i "s#APP_ENVIRONMENT=.*#APP_ENVIRONMENT=$OC_APP_ENVIRONMENT#g" .env
+sed -i "s#SESSION_LIFETIME=.*#SESSION_LIFETIME=$OC_SESSION_LIFETIME#g" .env
+sed -i "s#SESSION_EXPIRE_ON_CLOSE=.*#SESSION_EXPIRE_ON_CLOSE=$OC_SESSION_EXPIRE_ON_CLOSE#g" .env
+sed -i "s#SESSION_ENCRYPT=.*#SESSION_ENCRYPT=$OC_SESSION_ENCRYPT#g" .env
+sed -i "s#SESSION_COOKIE=.*#SESSION_COOKIE=$OC_SESSION_COOKIE#g" .env
+sed -i "s#ACTIVE_THEME=.*#ACTIVE_THEME=$OC_ACTIVE_THEME#g" .env
 
 
 # Log entry for the most recent processing of environment variables and config writing
@@ -280,8 +379,9 @@ sed -i "s#CACHE_DRIVER=.*#CACHE_DRIVER=$OC_CACHE_DRIVER#g" .env
 sed -i "s#SESSION_DRIVER=.*#SESSION_DRIVER=$OC_SESSION_DRIVER#g" .env
 
 # Delete the demo theme
-if [ "$OC_FRESH_INSTALL" = 'true' ] && [ -d "themes/october/demo" ] ; then
+if [ "$OC_FRESH_INSTALL" = 'true' ] && [ -d "themes/demo" ] ; then
     php artisan october:fresh
+    rm -rf plugins/october/demo
 fi
 
 # Set the active theme

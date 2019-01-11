@@ -397,4 +397,10 @@ fi
 # vars set by nginx-fpm-entrypoint.sh if not overridden here
 chown -R $USER_UID:$USER_GID /var/www/app
 
+# Load the user crontab file and then delete it
+if [ -f /user.crontab ] ; then
+    crontab -u $USER_NAME /user.crontab
+    rm /user.crontab
+fi
+
 exec "$@"

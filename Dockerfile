@@ -41,6 +41,8 @@ COPY ./php_db_test.php /usr/local/bin/php_db_test.php
 
 COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+COPY ./user.crontab /user.crontab
+
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 
 WORKDIR /var/www/app/

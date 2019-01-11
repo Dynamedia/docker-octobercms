@@ -4,7 +4,7 @@ FROM dynamedia/docker-nginx-fpm
 
 LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
 
-ENV OCTOBERCMS_TAG v1.0.443
+ENV OCTOBERCMS_TAG v1.0.446
 
 ### Install supplementary packages required by October CMS ###
 

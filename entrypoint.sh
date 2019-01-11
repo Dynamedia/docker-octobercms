@@ -329,6 +329,11 @@ sed -i "s#SESSION_ENCRYPT=.*#SESSION_ENCRYPT=$OC_SESSION_ENCRYPT#g" .env
 sed -i "s#SESSION_COOKIE=.*#SESSION_COOKIE=$OC_SESSION_COOKIE#g" .env
 sed -i "s#ACTIVE_THEME=.*#ACTIVE_THEME=$OC_ACTIVE_THEME#g" .env
 
+# Append custom env entries
+
+if [ -f .env-append ] ; then
+    cat .env-append >> .env
+fi
 
 # Log entry for the most recent processing of environment variables and config writing
 log_entry "Config last processed: " "$(get_date_time)"

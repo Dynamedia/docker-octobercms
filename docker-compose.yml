@@ -12,6 +12,7 @@ services:
       - ./data/storage:/var/www/app/storage/app/
       - ./data/plugins:/var/www/app/plugins/
       - ./data/themes:/var/www/app/themes/
+      # - ./.env-append:/var/www/app/.env-append
     # In production you'll want to have https. Use a reverse proxy ssl terminator in front of this container
     ports:
       - 80:80

@@ -16,9 +16,7 @@ RUN apt update && \
     curl -sL https://deb.nodesource.com/setup_11.x | bash - && \
     apt update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
-        nodejs \
-        sendmail-bin \
-        cron && \
+        nodejs && \
     apt clean && \
     rm -rf /var/lib/apt/lists/* && \
     ldconfig && \

@@ -195,6 +195,12 @@ install_git_repo()
         else
             (cd "$dest_path" && git pull)
         fi
+
+        # Install composer dependencies
+        if [ -f "${dest_path}/composer.json" ] ; then
+          (cd "$dest_path" && composer install)
+        fi
+
     done
 }
 
@@ -202,7 +208,10 @@ install_git_repo()
 
 # Move things back to their proper places. The build moved them to enable the entire october cms app to be a volume mount if desired
 
-mv demotheme themes/demo
+if [ -d demotheme ] && [ ! -d themes/demo ] ; then
+    mv demotheme themes/demo
+fi
+
 
 
 # Create log file if it's not present

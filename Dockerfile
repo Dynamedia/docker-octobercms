@@ -1,6 +1,6 @@
 # Some parts borrowed from https://github.com/aspendigital/docker-octobercms
 
-FROM dynamedia/docker-nginx-fpm
+FROM dynamedia/docker-nginx-fpm:v1.15.8_7.3.1
 
 LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
 

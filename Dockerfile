@@ -1,10 +1,10 @@
 # Some parts borrowed from https://github.com/aspendigital/docker-octobercms
 
-FROM dynamedia/docker-nginx-fpm:v1.15.8_7.3.1
+FROM dynamedia/docker-nginx-fpm:v1.17.3_7.3.9
 
 LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
 
-ENV OCTOBERCMS_TAG v1.0.446
+ENV OCTOBERCMS_TAG v1.0.458
 
 ### Install supplementary packages required by October CMS ###
 

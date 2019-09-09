@@ -3,7 +3,7 @@ version: "3.4"
 services:
   octobercms:
     build: .
-    image: dynamedia/docker-octobercms:v1.0.446
+    image: dynamedia/docker-octobercms:v1.0.458
     env_file:
       - .env
     restart: unless-stopped
@@ -14,7 +14,7 @@ services:
       - ./data/themes:/var/www/app/themes/
       # - ./.env-append:/var/www/app/.env-append
     # In production you'll want to have https. Use a reverse proxy ssl terminator in front of this container
-    #ports:
-    #  - 80:80
-    expose:
-      - 80
+    ports:
+      - 805:80
+   # expose:
+   #   - 80

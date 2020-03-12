@@ -3,7 +3,7 @@ version: "3.4"
 services:
   octobercms:
     build: .
-    image: dynamedia/docker-octobercms:v1.0.458
+    image: dynamedia/docker-octobercms:v1.0.464
     env_file:
       - .env
     restart: unless-stopped

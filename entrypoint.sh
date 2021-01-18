@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run the entrypoint script that comes with the web server image to set up the environment
+# Run the entrypoint script that comes with the web server image to set up the environment (users, permissions)
 nginx-fpm-entrypoint.sh
 
 # Setup October CMS
@@ -116,7 +116,9 @@ install_plugins()
         IFS=', ' read -r -a PLUGIN_ARRAY <<< "$OC_PLUGINS"
         for plugin in ${PLUGIN_ARRAY[@]}
             do
-               php artisan plugin:install $plugin
+               sleep 5
+               echo "going to install $plugin"
+               php artisan -vvv plugin:install $plugin
             done
         log_entry "Plugins Installed: " ${PLUGIN_ARRAY[@]}
         log_entry "Plugins last installed: " "$(get_date_time)"
@@ -302,7 +304,7 @@ sed -i "s#DB_PASSWORD=.*#DB_PASSWORD=$OC_DB_PASSWORD#g" .env
 sed -i "s#REDIS_HOST=.*#REDIS_HOST=$OC_REDIS_HOST#g" .env
 sed -i "s#REDIS_PASSWORD=.*#REDIS_PASSWORD=$OC_REDIS_PASSWORD#g" .env
 sed -i "s#CACHE_DRIVER=.*#CACHE_DRIVER=file#g" .env
-sed -i "s#SESSION_DRIVER=.*#SESSION_DRIVER=$file#g" .env
+sed -i "s#SESSION_DRIVER=.*#SESSION_DRIVER=file#g" .env
 sed -i "s#QUEUE_DRIVER=.*#QUEUE_DRIVER=$OC_QUEUE_DRIVER#g" .env
 sed -i "s#MAIL_DRIVER=.*#MAIL_DRIVER=$OC_MAIL_DRIVER#g" .env
 sed -i "s#MAIL_HOST=.*#MAIL_HOST=$OC_MAIL_HOST#g" .env
@@ -357,6 +359,7 @@ if [ "$OC_DB_CONNECTION" != "null" ] ; then
     # If plugins have not already been installed or we have set $OC_REDO_PLUGINS=true
     if plugins_changed ; then OC_REDO_PLUGINS=true ; fi
     if ! grep -qi '^Plugins last installed:' storage/logs/docker-october.log || [ $OC_REDO_PLUGINS = "true"  ]; then
+        cat .env
         install_plugins
     fi
 

@@ -2,19 +2,23 @@ version: "3.4"
 
 services:
   octobercms:
-    build: .
-    image: dynamedia/docker-octobercms:v1.0.464
     env_file:
       - .env
+    build:
+      context: .
+      args:
+        COMPOSER_AUTH: ${COMPOSER_AUTH}
+    image: dynamedia/docker-octobercms:v1.1
     restart: unless-stopped
     # October CMS needs to maintain state so it's a good idea to mount some volumes
     volumes:
-      - ./data/storage:/var/www/app/storage/app/
+      - ./data/storage/app:/var/www/app/storage/app/
+      - ./data/storage/logs:/var/www/app/storage/logs/
       - ./data/plugins:/var/www/app/plugins/
       - ./data/themes:/var/www/app/themes/
       # - ./.env-append:/var/www/app/.env-append
     # In production you'll want to have https. Use a reverse proxy ssl terminator in front of this container
     ports:
       - 805:80
-   # expose:
-   #   - 80
+    expose:
+      - 805

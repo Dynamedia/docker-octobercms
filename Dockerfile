@@ -1,19 +1,21 @@
 # Some parts borrowed from https://github.com/aspendigital/docker-octobercms
 
-FROM dynamedia/docker-nginx-fpm:v1.17.3_7.3.9
+# This will build from the 1.1 branch of October CMS
+
+# Nginx 1.19.6 + PHP-FPM 7.4.14
+FROM dynamedia/docker-nginx-fpm:v1.19.6_7.4.14
 
 LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
-
-ENV OCTOBERCMS_TAG v1.0.464
 
 ### Install supplementary packages required by October CMS ###
 
 RUN apt update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
         curl \
+        ssh \
         software-properties-common \
         gnupg2 && \
-    curl -sL https://deb.nodesource.com/setup_11.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
     apt update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
         nodejs && \
@@ -24,13 +26,13 @@ RUN apt update && \
     mv /usr/local/bin/entrypoint.sh /usr/local/bin/nginx-fpm-entrypoint.sh && \
     cd /var/www/ && \
     rm -rf app && \
-    rm /etc/nginx/sites-enabled/conf.d/php.conf && \
-    git clone https://github.com/octobercms/october.git -b $OCTOBERCMS_TAG --depth 1 app && \
+    rm /etc/nginx/sites-enabled/conf.d/php.conf
+
+ARG COMPOSER_AUTH
+
+RUN composer --no-cache create-project october/october app v1.1.* && \
+    composer clear-cache && \
     cd app && \
-    composer install --no-interaction --prefer-dist --no-scripts && \
-    composer clearcache && \
-    git status && git reset --hard HEAD && \
-    rm -rf .git && \
     mv themes/demo/ ./demotheme
 
 COPY ./octobercms.conf /etc/nginx/sites-enabled/conf.d/octobercms.conf

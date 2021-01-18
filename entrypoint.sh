@@ -359,7 +359,6 @@ if [ "$OC_DB_CONNECTION" != "null" ] ; then
     # If plugins have not already been installed or we have set $OC_REDO_PLUGINS=true
     if plugins_changed ; then OC_REDO_PLUGINS=true ; fi
     if ! grep -qi '^Plugins last installed:' storage/logs/docker-october.log || [ $OC_REDO_PLUGINS = "true"  ]; then
-        cat .env
         install_plugins
     fi
 

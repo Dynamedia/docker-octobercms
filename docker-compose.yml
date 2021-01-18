@@ -19,6 +19,6 @@ services:
       # - ./.env-append:/var/www/app/.env-append
     # In production you'll want to have https. Use a reverse proxy ssl terminator in front of this container
     ports:
-      - 805:80
+      - 80:80
     expose:
-      - 805
+      - 80

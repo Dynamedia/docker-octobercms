@@ -1,0 +1,10 @@
+# This will simply copy any existing configuration and data into the image
+# In most cases, this is a *VERY BAD IDEA* - However, it is useful for playground sites that need to refresh periodically
+
+FROM mysql:8
+
+LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
+
+COPY ./.config/mysql/my.cnf /etc/mysql/conf.d/my.cnf
+COPY ./data/mysql /var/lib/mysql
+

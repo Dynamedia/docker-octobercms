@@ -6,6 +6,7 @@ services:
       - .env
     build:
       context: .
+      dockerfile: Dockerfile_octobercms
       args:
         COMPOSER_AUTH: ${COMPOSER_AUTH}
         OCTOBER_LICENSE: ${OCTOBER_LICENSE}
@@ -37,10 +38,14 @@ services:
 
   database:
     image: mysql:8
+    build:
+      context: .
+      dockerfile: Dockerfile_mysql
     environment:
       MYSQL_DATABASE: october
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
+     # - ./data/mysql:/var/lib/mysql
       - ./.config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     restart: unless-stopped
     networks:

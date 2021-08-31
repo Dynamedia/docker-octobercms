@@ -1,0 +1,55 @@
+version: "3.7"
+
+services:
+  octobercms:
+    env_file:
+      - .env
+    build:
+      context: .
+      args:
+        COMPOSER_AUTH: ${COMPOSER_AUTH}
+        OCTOBER_LICENSE: ${OCTOBER_LICENSE}
+    image: dynamedia/docker-octobercms:v2
+    restart: unless-stopped
+    # October CMS needs to maintain state so it's a good idea to mount some volumes
+    # Consider using named volumes in production
+    volumes:
+      # Mount the entire app directory. Env separate for pre-launch modifications
+      - ./data/app:/var/www/app
+      - ./.config/october-env:/var/www/app/.env
+      # As per README, changes to these files will be included in subsequent builds
+      # Nginx specific mounts (exact copy of that in container)
+      - ./.config/nginx/default/sites-enabled:/etc/nginx/sites-enabled/
+      - ./.config/nginx/default/nginx.conf:/etc/nginx/nginx.conf
+      # PHP specific mounts (exact copy of that in container)
+      - ./.config/php/default/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ./.config/php/default/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - backend
+      #- reverse-proxy
+    # In production you'll want to have https. Use a reverse proxy ssl terminator in front of this container -
+    # Try https://github.com/docker-reverse-proxy (nginx, docker-gen, letsencrypt companion)
+    # You will need to remove the ports declaration, expose port 80 & do docker network create reverse-proxy
+    ports:
+      - 800:80
+    expose:
+      - 80
+
+  database:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: october
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - ./.config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    restart: unless-stopped
+    networks:
+      - backend
+
+networks:
+  # Uncomment below to use with reverse proxy
+  #reverse-proxy:
+  #  external:
+  #    name: reverse-proxy
+  backend:
+    driver: bridge

@@ -2,7 +2,7 @@
 
 Nginx, PHP FPM and October CMS.
 
-Nginx and PHP are managed by supervisord. This will not suit all tastes, but Winter is completely dependent
+Nginx and PHP are managed by supervisord. This will not suit all tastes, but October CMS is completely dependent
 on PHP and requires a web server, so they are bundled. It is, however, relatively easy to rebuild the image 
 without Nginx should you wish to separate them or use an alternative web server.
 

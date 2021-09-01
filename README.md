@@ -1,5 +1,10 @@
 # October CMS based on PHP-FPM & Nginx
 
+This repo will build October CMS v2 with your license key. Do not share the images.
+
+Building with an empty data/app & data/mysql will give a clean install. Any subsequent build
+will package your local changes.
+
 Nginx, PHP FPM and October CMS.
 
 Nginx and PHP are managed by supervisord. This will not suit all tastes, but October CMS is completely dependent

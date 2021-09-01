@@ -125,7 +125,7 @@ COPY ./.config/nginx/default/sites-enabled /etc/nginx/sites-enabled
 COPY ./.config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY ./.config/user.crontab /user.crontab
 
-COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./entrypoint-octobercms.sh /usr/local/bin/entrypoint.sh
 
 WORKDIR /var/www/app/
 

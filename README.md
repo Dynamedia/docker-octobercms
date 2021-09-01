@@ -2,8 +2,12 @@
 
 This repo will build October CMS v2 with your license key. Do not share the images.
 
-Building with an empty data/app & data/mysql will give a clean install. Any subsequent build
+Building octobercms with an empty data/app directory will give a clean install. Any subsequent build
 will package your local changes.
+
+Building mysql with a populated data/mysql will bundle your database. Local mounts will not
+be clobbered at runtime (tar - k). This is useful for deploying/developing your app with a known 
+state but which can be safely expanded upon.
 
 Nginx, PHP FPM and October CMS.
 
@@ -90,14 +94,9 @@ docker-compose up
 
 ## Warnings
 
-Do not modify the core. Core files WILL be overwritten on container start. This doesn't affect the config 
-directory, plugins, themes or storage.
-
-If you do a core update then filesystem changes will be reverted, but the database will not. 
-Upgrading should only be done by pulling a new container. Don't do in-place upgrades unless you know what
-you are doing.
-
 Please ensure that you read and understand the provided Dockerfile and entrypoint.sh before using.
+
+Do not share images - You must build this image locally or use a private repository (OC License)
 
 ## Bugs
 

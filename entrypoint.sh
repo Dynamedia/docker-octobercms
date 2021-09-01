@@ -173,7 +173,7 @@ echo "Writing core files from install..."
 tar -zxf /var/www/app.tar.gz -C /var/www/ > /dev/null 2>&1
 # Extract the overlay archive - Local changes in data/app when the image was built
 echo "Applying local changes from build time"
-tar -zxf /var/www/app-overlay.tag.gz -C /var/www/ > /dev/null 2>&1
+tar -zxf /var/www/app-overlay.tar.gz -C /var/www/ > /dev/null 2>&1
 
 ### Delete this according to notes in Dockerfile - Overlay method preferred
 ### tar -k -zxf /var/www/app/config.tar.gz -C /var/www/app/ > /dev/null 2>&1

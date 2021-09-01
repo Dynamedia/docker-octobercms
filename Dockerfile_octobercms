@@ -43,8 +43,10 @@ RUN composer --no-cache create-project october/october app v2.* && \
     php artisan project:set ${OCTOBER_LICENSE} && \
     php artisan october:build
 
-# Be careful here. You will clobber files. Know your data directory when building
-COPY ./data/app /var/www/app
+# Be careful here. You might clobber files. Know your data directory when building
+COPY ./data/app/storage /var/www/app/storage
+COPY ./data/app/plugins /var/www/app/plugins
+COPY ./data/app/themes /var/www/app/themes
 
 # Sanitise the .env. **Do not ship this container with an app key**, it has to be generated on first run
 

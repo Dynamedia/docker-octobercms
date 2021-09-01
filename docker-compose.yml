@@ -10,7 +10,7 @@ services:
       args:
         COMPOSER_AUTH: ${COMPOSER_AUTH}
         OCTOBER_LICENSE: ${OCTOBER_LICENSE}
-    image: dynamedia/docker-octobercms:v2
+    image: dynamedia-octobercms:v2
     restart: unless-stopped
     # October CMS needs to maintain state so it's a good idea to mount some volumes
     # Consider using named volumes in production
@@ -37,7 +37,7 @@ services:
     #  - 80
 
   database:
-    image: mysql:8
+    image: dynamedia-mysql:8
     build:
       context: .
       dockerfile: Dockerfile_mysql

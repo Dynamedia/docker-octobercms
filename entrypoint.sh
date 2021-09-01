@@ -168,9 +168,15 @@ config_wants_database()
 # This is DESTRUCTIVE. Do not modify core files because they will be OVERWRITTEN on container start
 # Plugins, themes, storage, config and .env file will not be affected
 echo "Setting up app directory..."
-echo "Overwriting /var/www/app but saving config directory"
+# Extract the core files as they were installed
+echo "Writing core files from install..."
 tar -zxf /var/www/app.tar.gz -C /var/www/ > /dev/null 2>&1
-tar -k -zxf /var/www/app/config.tar.gz -C /var/www/app/ > /dev/null 2>&1
+# Extract the overlay archive - Local changes in data/app when the image was built
+echo "Applying local changes from build time"
+tar -zxf /var/www/app-overlay.tag.gz -C /var/www/ > /dev/null 2>&1
+
+### Delete this according to notes in Dockerfile - Overlay method preferred
+### tar -k -zxf /var/www/app/config.tar.gz -C /var/www/app/ > /dev/null 2>&1
 
 # Check we have a valid .env file. User is expected to mount it but if it's missing we can create one
 
@@ -190,7 +196,7 @@ fi
 # Create log file if it's not present
 touch storage/logs/docker-october.log
 
-# Create a sqlite database file. It's the container default so make sure its here
+# Create a sqlite database file - If this location isn't a bind mount/volume it WILL NOT PERSIST
 touch /var/www/app/storage/app/database.sqlite
 
 # Log entry for the most recent processing of environment variables and config writing

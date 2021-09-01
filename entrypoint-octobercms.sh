@@ -162,21 +162,11 @@ config_wants_database()
 
 ### End Functions ###
 
-# Move things back to their proper places. The build moved them to enable the entire october cms app to be a volume mount if desired
-
-# We have an archive of the app structure so lets just extract it (for bind mount app dir)
-# This is DESTRUCTIVE. Do not modify core files because they will be OVERWRITTEN on container start
-# Plugins, themes, storage, config and .env file will not be affected
-echo "Setting up app directory..."
-# Extract the core files as they were installed
-echo "Writing core files from install..."
-tar -zxf /var/www/app.tar.gz -C /var/www/ > /dev/null 2>&1
-# Extract the overlay archive - Local changes in data/app when the image was built
-echo "Applying local changes from build time"
-tar -zxf /var/www/app-overlay.tar.gz -C /var/www/ > /dev/null 2>&1
-
-### Delete this according to notes in Dockerfile - Overlay method preferred
-### tar -k -zxf /var/www/app/config.tar.gz -C /var/www/app/ > /dev/null 2>&1
+# Write the files into the volume, but only if there is no index.php
+if [ ! -f /var/www/app/index.php ] ; then
+  echo "Writing core files from install..."
+  tar -zxf /var/www/app.tar.gz -C /var/www/ > /dev/null 2>&1
+fi
 
 # Check we have a valid .env file. User is expected to mount it but if it's missing we can create one
 

@@ -1,6 +1,6 @@
 APP_DEBUG=true
 APP_URL=http://octobercms.local
-APP_KEY=base64:id0gOgV9VkPTBoD1rRRTuHPIc7LI9y0/bL9AV/FciZ0=
+APP_KEY=
 
 DB_CONNECTION=mysql
 DB_HOST=database
@@ -29,7 +29,7 @@ MAIL_PASSWORD=null
 ROUTES_CACHE=false
 ASSET_CACHE=false
 DATABASE_TEMPLATES=false
-LINK_POLICY=detect
+LINK_POLICY=force
 ENABLE_CSRF=true
 
 EDGE_UPDATES=false

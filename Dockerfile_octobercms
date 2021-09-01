@@ -43,6 +43,9 @@ RUN composer --no-cache create-project october/october app v2.* && \
     php artisan project:set ${OCTOBER_LICENSE} && \
     php artisan october:build
 
+# Be careful here. You will clobber files. Know your data directory when building
+COPY ./data/app /var/www/app
+
 # Sanitise the .env. **Do not ship this container with an app key**, it has to be generated on first run
 
 RUN sed -i "s#DB_CONNECTION=.*#DB_CONNECTION=mysql#g" /var/www/app/.env && \
@@ -55,18 +58,6 @@ RUN sed -i "s#DB_CONNECTION=.*#DB_CONNECTION=mysql#g" /var/www/app/.env && \
     sed -i "s#LINK_POLICY=.*#LINK_POLICY=force#g" /var/www/app/.env && \
     cp /var/www/app/.env /var/www/app/.env-original && \
     tar -C /var/www/ -zcvf /var/www/app.tar.gz app
-
-# Copy any local changes into the image
-# This could all be done in one step above to save space/time, but we're not (env can decide clobber preference at runtime)
-
-RUN mkdir -p /tmp/app-overlay
-
-COPY ./data/app /tmp/app-overlay/app
-
-RUN (sed -i "s#APP_KEY=.*#APP_KEY=#g" /tmp/app-overlay/app/.env || true) && \
-    tar -C /tmp/app-overlay/ -zcvf /var/www/app-overlay.tar.gz app && \
-    rm -rf /tmp/app-overlay
-
 
 # These are the files and directories we mount via docker-compose.yml - When we build, we copy into the image
 COPY ./.config/php/default/www.conf /usr/local/etc/php-fpm.d/www.conf

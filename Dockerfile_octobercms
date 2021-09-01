@@ -105,7 +105,7 @@ RUN sed -i "s#DB_CONNECTION=.*#DB_CONNECTION=sqlite#g" /var/www/app/.env && \
 
 # Copy any local changes into the image
 # This could all be done in one step above to save space/time, but we're not (env can decide clobber preference at runtime)
-COPY ./.data/app /tmp/app
+COPY ./data/app /tmp/app
 RUN tar -C /tmp/ -zcvf /var/www/app-overlay.tar.gz app && \
     rm -rf /tmp/app
 

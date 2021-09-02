@@ -13,9 +13,9 @@ COPY ./data/mysql /tmp/mysql-data/mysql
 RUN tar -C /tmp/mysql-data/ -zcvf /var/lib/mysql-overlay.tar.gz mysql && \
     rm -rf /tmp/mysql-data
 
-COPY ./entrypoint-mysql-default.sh usr/local/bin/docker-entrypoint.sh
+COPY ./build/entrypoint-mysql-default.sh usr/local/bin/docker-entrypoint.sh
 
-COPY ./entrypoint-mysql.sh /usr/local/bin/entrypoint-mysql.sh
+COPY ./build/entrypoint-mysql.sh /usr/local/bin/entrypoint-mysql.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint-mysql.sh"]
 

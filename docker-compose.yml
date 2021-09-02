@@ -6,7 +6,7 @@ services:
       - .env
     build:
       context: .
-      dockerfile: Dockerfile_octobercms
+      dockerfile: build/Dockerfile_octobercms
       args:
         COMPOSER_AUTH: ${COMPOSER_AUTH}
         OCTOBER_LICENSE: ${OCTOBER_LICENSE}
@@ -37,10 +37,12 @@ services:
     #  - 80
 
   database:
+    env_file:
+      - .env
     image: dynamedia-mysql:8
     build:
       context: .
-      dockerfile: Dockerfile_mysql
+      dockerfile: build/Dockerfile_mysql
     environment:
       MYSQL_DATABASE: october
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"

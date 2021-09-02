@@ -3,11 +3,16 @@
 This repo will build October CMS v2 with your license key. Do not share the images.
 
 Building octobercms with an empty data/app directory will give a clean install. Any subsequent build
-will package your local changes.
+will package your local changes to plugins, themes & storage.
 
-Building mysql with a populated data/mysql will bundle your database. Local mounts will not
-be clobbered at runtime (tar - k). This is useful for deploying/developing your app with a known 
-state but which can be safely expanded upon.
+Building mysql with a populated data/mysql will bundle your database. 
+
+**Running the container with bind mounts**: If data/app does not contain index.php, the app will be extracted into the
+data/app directory - This is useful in development.
+
+If data/mysql is empty, any database files bundled in the app will be extracted to data/mysql - this is useful for reverting
+an app to a known state.
+
 
 Nginx, PHP FPM and October CMS.
 

@@ -70,7 +70,7 @@ process will copy them to their respective locations within the image when it is
 
 ## Getting Started
 
-You can use this standalone and access, by default, at localhost:80 but for best results in multi-site
+You can use this standalone and access, by default, at octobercms.local:800 but for best results in multi-site
 environments use alongside [this](https://github.com/dynamedia/docker-reverse-proxy) reverse proxy, which supports 
 setting the hostname and letsencrypt SSL.
 
